@@ -1,8 +1,9 @@
+import 'package:doan/SignUpScreen/createUser.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'ProfileScreen.dart';
+import '../ProfileScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -98,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
             const SizedBox(
-              height: 80,
+              height: 50,
             ),
             Container(
               width: double.infinity,
@@ -144,7 +145,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 10.0),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6.0)),
-                onPressed: () {},
+                onPressed: () {
+                   Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateUser()));
+                },
                 child: const Text(
                   'Tạo tài khoản mới',
                   style: TextStyle(

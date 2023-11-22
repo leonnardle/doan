@@ -1,12 +1,21 @@
-import 'package:doan/LoginScreen.dart';
+import 'package:doan/SignInScreen/LoginScreen.dart';
 import 'package:doan/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'Bloc/sign_up/create_user_bloc.dart';
+import 'SignUpScreen/createUser.dart';
 
 Future<void> main()  async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp( const MyApp());
+  runApp(   BlocProvider(
+    create: (context) {
+      return CreateUserBloc();
+    },
+    child: const MyApp(),
+  ),);
 }
 
 class MyApp extends StatelessWidget {
@@ -43,7 +52,7 @@ class _HomepageState extends State<HomePage> {
           future: Firebase.initializeApp(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              return LoginScreen();
+              return const LoginScreen();
             }
             else{
             return const Center(
