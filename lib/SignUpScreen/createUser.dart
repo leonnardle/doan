@@ -12,8 +12,11 @@ class CreateUser extends StatefulWidget {
 
 class _CreateUserState extends State<CreateUser> {
   DateTime selectedDate = DateTime.now();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _fullName = TextEditingController();
+  final TextEditingController _phoneNumber = TextEditingController();
+  final TextEditingController _address = TextEditingController();
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = (await showDatePicker(
       context: context,
@@ -75,21 +78,24 @@ class _CreateUserState extends State<CreateUser> {
                       )
                   ) ,
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                 TextField(
+                  controller: _fullName,
+                  decoration: const InputDecoration(
                     hintText: "Họ và tên",
                     prefixIcon: Icon(Icons.person),
                   ),
                 ),
-                const TextField(
+                TextField(
+                  controller: _phoneNumber,
                   keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "số điện thoại",
                     prefixIcon: Icon(Icons.phone),
                   ),
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: _address,
+                  decoration: const InputDecoration(
                     hintText: "địa chỉ",
                     prefixIcon: Icon(Icons.home),
                   ),
@@ -115,6 +121,10 @@ class _CreateUserState extends State<CreateUser> {
                         RegisterButtonPressed(
                           email: _emailController.text,
                           password: _passwordController.text,
+                          fullName: _fullName.text,
+                          phoneNumber: _phoneNumber.text,
+                          address: _address.text,
+                          dateOfBirth: selectedDate,
                         ),
                     );
                   },

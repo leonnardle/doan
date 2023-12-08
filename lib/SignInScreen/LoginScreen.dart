@@ -18,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
       {required String email,
       required String password,
       required BuildContext context}) async {
-    // lệnh này trả về đối tượng rồi từ đó lấy đối tượng đó để thực hiện thao tác xác thực
+    // lệnh này đợi và trả về đối tượng rồi từ đó lấy đối tượng đó để thực hiện thao tác xác thực
     FirebaseAuth auth = FirebaseAuth.instance;
     User? user;
     try {
@@ -42,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
       color: const Color.fromARGB(52, 194, 60, 100),
       child: Center(
         child: Column(
+
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

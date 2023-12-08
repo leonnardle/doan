@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'Bloc/sign_up/create_user_bloc.dart';
-import 'SignUpScreen/createUser.dart';
 
 Future<void> main()  async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(   BlocProvider(
+  runApp(
+    BlocProvider(
     create: (context) {
       return CreateUserBloc();
     },
@@ -52,7 +52,7 @@ class _HomepageState extends State<HomePage> {
           future: Firebase.initializeApp(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              return const LoginScreen();
+              return  LoginScreen();
             }
             else{
             return const Center(
