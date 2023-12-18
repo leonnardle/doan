@@ -1,4 +1,5 @@
 import 'package:doan/SignUpScreen/createUser.dart';
+import 'package:doan/service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -118,18 +119,33 @@ class _LoginScreenState extends State<LoginScreen> {
                       email: _emailController.text,
                       password: _passwordController.text,
                       context: context);
-                  print(user);
                   if (user != null) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => ProfileScreen(),
-                      ),
-                    );
-                  }
-                  else
-                    {
-                      showToast('không thấy người dùng , hãy đăng ký ');
+                    // Kiểm tra xem email có phải là "trungquocle636@gmail.com" không
+                    if (user.email == "trungquocle636@gmail.com") {
+                      // Nếu đúng, chuyển hướng đến màn hình AdminScreen
+                       Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => service(),
+                        ),
+                            (route) => false, // Điều này loại bỏ tất cả các màn hình khỏi ngăn xếp.
+                      );
+
+                    } else {
+                      // Nếu không phải là email trên, chuyển hướng đến màn hình ProfileScreen
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfileScreen(),
+                        ),
+                            (route) => false, // Điều này loại bỏ tất cả các màn hình khỏi ngăn xếp.
+                      );
+
                     }
+                  } else {
+                    showToast('Không tìm thấy người dùng, hãy đăng ký');
+                  }
+
                 },
                 child: const Text(
                   'Đăng nhập',

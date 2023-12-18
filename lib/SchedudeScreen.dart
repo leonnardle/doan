@@ -49,18 +49,7 @@ class _schedudeScreenState extends State<schedudeScreen> {
               ),
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => service(),));
-                  },
-                  child: Text("DỊCH VỤ"),
-                ),
-              ),
-            ],
-          )
+
 
         ],
       )),

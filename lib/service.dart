@@ -1,6 +1,9 @@
 import 'package:doan/Bloc/serviceBloc/serviceBloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'SignInScreen/LoginScreen.dart';
 
 class service extends StatefulWidget {
   const service({super.key});
@@ -18,10 +21,38 @@ class _serviceState extends State<service> {
     super.initState();
     BlocProvider.of<serviceBloc>(context).add(FetchDichVuListOnInit());
   }
-
+  Future<void> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Đăng xuất thành công, bạn có thể thực hiện các công việc cần thiết sau khi đăng xuất ở đây
+    } catch (e) {
+      print("Lỗi khi đăng xuất: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: AssetImage('assets/image/logo.jpeg'),
+            ),
+            SizedBox(width: 15),
+            Text('Hi admin'),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.lock_open_rounded),
+            onPressed: () {
+              signOut();
+              Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(),));
+            },
+          ),
+        ],
+      ),
       body: Container(
         margin: const EdgeInsets.only(top: 100),
         child: Column(

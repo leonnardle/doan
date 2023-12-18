@@ -23,7 +23,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
-      // Đăng xuất thành công, bạn có thể thực hiện các công việc cần thiết sau khi đăng xuất ở đây
     } catch (e) {
       print("Lỗi khi đăng xuất: $e");
     }
@@ -91,11 +90,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.access_alarms),
+              icon: Icon(Icons.lock_open_rounded),
               onPressed: () {
                 signOut();
                 Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(),));
-
               },
             ),
           ],
