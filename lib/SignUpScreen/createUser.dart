@@ -1,5 +1,7 @@
+import 'package:doan/SignInScreen/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../Bloc/sign_up/create_user_bloc.dart';
 
@@ -127,6 +129,8 @@ class _CreateUserState extends State<CreateUser> {
                           dateOfBirth: selectedDate,
                         ),
                     );
+                    Fluttertoast.showToast(msg: "tao tai khoan thanh cong");
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(),));
                   },
                   constraints: const BoxConstraints(
                     minWidth: double.infinity,

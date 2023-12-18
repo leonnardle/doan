@@ -35,12 +35,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _emailController = TextEditingController();
-    TextEditingController _passwordController = TextEditingController();
+    TextEditingController _emailController = TextEditingController(text: "test@gmail.com");
+    TextEditingController _passwordController = TextEditingController(text: "00000000");
 
-    return Container(
+    return Scaffold(body: Container(
       color: const Color.fromARGB(52, 194, 60, 100),
-      child: Center(
+      child:
+      Expanded(child:
+      Center(
         child: Column(
 
           mainAxisAlignment: MainAxisAlignment.start,
@@ -66,7 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
-                hintText: "user email",
+                //hintText: "user email",
+
                 prefixIcon: Icon(
                   Icons.mail,
                   color: Colors.black,
@@ -161,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
-    );
+    )));
   }
   void showToast(String Message)=> Fluttertoast.showToast(
     msg: "không thấy người dùng , có muốn đăng ký ?",

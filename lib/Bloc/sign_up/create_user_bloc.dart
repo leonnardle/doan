@@ -14,6 +14,7 @@ class RegisterButtonPressed extends CreateUserEvent {
   final String address;
   final DateTime dateOfBirth;
 
+
   RegisterButtonPressed({
     required this.email,
     required this.password,
@@ -45,8 +46,6 @@ class RegistrationErrorState extends CreateUserState {
   final String error;
   RegistrationErrorState({required this.error});
 }
-
-
 
 // Bloc
 class CreateUserBloc extends Bloc<CreateUserEvent, CreateUserState> {

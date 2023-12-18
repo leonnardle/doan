@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doan/Bloc/sign_up/create_user_bloc.dart';
 import 'package:doan/SchedudeScreen.dart';
+import 'package:doan/SignInScreen/LoginScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,15 +13,21 @@ import 'model/Customer.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
-
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
   // Đối tượng Customer để lưu thông tin người dùng
-  Customer _customer = Customer.name("", "", "", "", DateTime.now());
-
+  final Customer _customer = Customer('',',','','',DateTime.now());
+  Future<void> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Đăng xuất thành công, bạn có thể thực hiện các công việc cần thiết sau khi đăng xuất ở đây
+    } catch (e) {
+      print("Lỗi khi đăng xuất: $e");
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -79,30 +86,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundImage: AssetImage('assets/image/logo.jpeg'),
               ),
               SizedBox(width: 15),
-              // Hiển thị tên người dùng
               Text('Hi ${_customer.name}'),
             ],
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.notifications),
+              icon: Icon(Icons.access_alarms),
               onPressed: () {
-                // Xử lý khi người dùng nhấn vào nút thông báo
+                signOut();
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(),));
+
               },
             ),
           ],
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(onPressed: (){
-                 Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedudeScreen(appointmentBloc: BlocProvider.of<AppointmentBloc>(context))));
-              }, child: Text('dat lich'))
-            ],
-          ),
-        ),
+        body: schedudeScreen(appointmentBloc: AppointmentBloc(),)
       ),
     );
   }
 }
+
+

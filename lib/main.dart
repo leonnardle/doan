@@ -1,28 +1,38 @@
+import 'package:doan/Bloc/serviceBloc/serviceBloc.dart';
 import 'package:doan/SignInScreen/LoginScreen.dart';
 import 'package:doan/firebase_options.dart';
+import 'package:doan/registerSchedude.dart';
+import 'package:doan/service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'Bloc/Schedude/schedude_bloc.dart';
 import 'Bloc/sign_up/create_user_bloc.dart';
 
-Future<void> main()  async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
-    BlocProvider(
-    create: (context) {
-      return CreateUserBloc();
-    },
-    child: const MyApp(),
-  ),);
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<CreateUserBloc>(
+          create: (context) => CreateUserBloc(),
+        ),
+        BlocProvider<AppointmentBloc>(
+          create: (context) => AppointmentBloc(),
+        ),
+        BlocProvider<serviceBloc>(
+          create: (context) => serviceBloc(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
@@ -32,34 +42,28 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  // khoi tao firebase
-  const HomePage({
-    super.key,
-  });
+  const HomePage({super.key});
 
   @override
   _HomepageState createState() => _HomepageState();
 }
 
 class _HomepageState extends State<HomePage> {
-
-
   @override
   Widget build(BuildContext context) {
-    // tra về giao diện đăng nhập
     return Scaffold(
       body: FutureBuilder(
-          future: Firebase.initializeApp(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return  LoginScreen();
-            }
-            else{
+        future: Firebase.initializeApp(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return LoginScreen();
+          } else {
             return const Center(
               child: CircularProgressIndicator(),
             );
-            }
-          }),
+          }
+        },
+      ),
     );
   }
 }

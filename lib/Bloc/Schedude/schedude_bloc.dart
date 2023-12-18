@@ -10,8 +10,8 @@ class timeButtonPressed extends AppointmentEvent{
   final String name;
   final String phone;
   final DateTime time;
-
-  timeButtonPressed(this.name, this.phone, this.time);
+  final String loaidichvu;
+  timeButtonPressed(this.name, this.phone, this.time, this.loaidichvu);
 }
 //state
    /* + trạng thái loading : khi ấn nút
@@ -65,10 +65,13 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     try {
       CollectionReference Appointment =
       FirebaseFirestore.instance.collection('Appointment');
-      await Appointment.doc(event.name).set({
+      Timestamp appointmentTime = Timestamp.fromDate(event.time);
+
+      await Appointment.doc(event.phone).set({
         'name': event.name,
-        'phone': event.phone,
-        'time': event.time,
+        'phonenumber': event.phone,
+        'time':appointmentTime ,
+        'dichvu':event.loaidichvu
       });
     } catch (error) {
       print("Error storing user info in Firestore: $error");
