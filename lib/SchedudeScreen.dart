@@ -49,8 +49,6 @@ class _schedudeScreenState extends State<schedudeScreen> {
               ),
             ),
           ),
-
-
         ],
       )),
     );

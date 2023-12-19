@@ -121,6 +121,7 @@ class _registerSchedudeState extends State<registerSchedude> {
     return Scaffold(
       body: Center(
         child: Expanded(
+          flex: 1,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,6 +280,7 @@ class _registerSchedudeState extends State<registerSchedude> {
                 ],
               ),
               Expanded(
+                flex: 1,
                 child: Row(
                   children: [
                     Text("Chọn loại dịch vụ"),
@@ -288,7 +290,8 @@ class _registerSchedudeState extends State<registerSchedude> {
                     BlocBuilder<serviceBloc, serviceState>(
                       builder: (context, state) {
                         if (state is LoadedDichVuList) {
-                          return DropdownButton(
+                          return DropdownButton<String>(
+                            value: selectedValue, // Giá trị mặc định
                             items: state.danhSachGiaTri
                                 .asMap()
                                 .entries
@@ -299,16 +302,17 @@ class _registerSchedudeState extends State<registerSchedude> {
                                 value: value,
                                 child: Text(value),
                               );
-                            }).toList(),
+                            })
+                                .toList(),
                             onChanged: (String? newValue) {
                               if (newValue != null) {
-                                // Khi giá trị thay đổi, cập nhật selectedIndex
                                 setState(() {
                                   selectedValue = newValue;
                                 });
                               }
                             },
                           );
+                          ;
                         } else {
                           return CircularProgressIndicator();
                         }

@@ -42,7 +42,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(body: Container(
       color: const Color.fromARGB(52, 194, 60, 100),
       child:
-      Expanded(child:
+      Expanded(
+        flex: 1,
+        child:
       Center(
         child: Column(
 
