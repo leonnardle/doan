@@ -1,5 +1,6 @@
 import 'package:doan/Bloc/serviceBloc/serviceBloc.dart';
 import 'package:doan/SignInScreen/LoginScreen.dart';
+import 'package:doan/firebase_api.dart';
 import 'package:doan/firebase_options.dart';
 import 'package:doan/registerSchedude.dart';
 import 'package:doan/service.dart';
@@ -12,6 +13,7 @@ import 'Bloc/sign_up/create_user_bloc.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseApi().initNotification();
   runApp(
     MultiBlocProvider(
       providers: [

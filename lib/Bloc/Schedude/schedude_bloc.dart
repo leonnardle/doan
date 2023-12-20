@@ -1,81 +1,239 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../firebase_api.dart';
+// dùng để thông báo
+final FirebaseApi firebaseApi = FirebaseApi();
 
-// event cuộc hẹn
-abstract class AppointmentEvent{}
+class AppointmentData {
+  final String name;
+  final String phoneNumber;
+  final DateTime time;
+  final String loaiDichVu;
+  final String status;
 
-//sự kiện khi ấn nút chọn giờ
-class timeButtonPressed extends AppointmentEvent{
+  AppointmentData({
+    required this.name,
+    required this.phoneNumber,
+    required this.time,
+    required this.loaiDichVu,
+    required this.status,
+  });
+}
+
+abstract class AppointmentEvent {}
+
+class TimeButtonPressed extends AppointmentEvent {
   final String name;
   final String phone;
   final DateTime time;
-  final String loaidichvu;
-  timeButtonPressed(this.name, this.phone, this.time, this.loaidichvu);
+  final String loaiDichVu;
+
+  TimeButtonPressed(this.name, this.phone, this.time, this.loaiDichVu);
 }
+
+class ConfirmButtonPressed extends AppointmentEvent {
+  final String phone;
+
+  ConfirmButtonPressed(this.phone);
+}
+
+class RejectButtonPressed extends AppointmentEvent {
+  final String phone;
+
+  RejectButtonPressed(this.phone);
+}
+
+class FetchAppointmentData extends AppointmentEvent {}
+class AddAppointmentEvent extends AppointmentEvent {
+  final AppointmentData newAppointment;
+
+  AddAppointmentEvent(this.newAppointment);
+}
+
+
 //state
-   /* + trạng thái loading : khi ấn nút
-    + trạng thái thành công : khi gửi lên firebase mà không gặp ván đề nào
-    + trạng tháithaatsst bai : khi gửi lên firebase mà gặp ván đề
-    + trạng thái đã hoàn thành
-*/
-abstract class AppointmentState{}
+abstract class AppointmentState {}
+
 class InitialAppointmentState extends AppointmentState {}
 
 class LoadingState extends AppointmentState {}
+
+class WaitingForConfirmation extends AppointmentState {}
+
 class SendingSucceed extends AppointmentState {}
+
 class SendingError extends AppointmentState {
-  //thong bao loi
   final String error;
+
   SendingError({required this.error});
 }
-//bloc
+
+class LoadedAppointmentData extends AppointmentState {
+  final List<AppointmentData> appointmentDataList;
+
+  LoadedAppointmentData(this.appointmentDataList);
+}
 
 class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
   AppointmentBloc() : super(InitialAppointmentState());
 
   @override
   Stream<AppointmentState> mapEventToState(AppointmentEvent event) async* {
-    if (event is timeButtonPressed) {
+    if (event is TimeButtonPressed) {
+      yield LoadingState();
       yield* _handleSendAppointment(event);
+    } else if (event is FetchAppointmentData) {
+      yield LoadingState();
+      yield* _handleFetchAppointmentData();
+    } else if (event is ConfirmButtonPressed) {
+      // Xử lý nút "Xác nhận" tại đây
+      yield* _handleConfirmAppointment(event);
+    } else if (event is RejectButtonPressed) {
+      // Xử lý nút "Từ chối" tại đây
+      yield* _handleRejectAppointment(event);
     }
   }
-
-  Stream<AppointmentState> _handleSendAppointment(
-      timeButtonPressed event) async* {
+  Stream<AppointmentState> _handleSendAppointment(TimeButtonPressed event) async* {
     try {
       if (event.time != null) {
-        // Đăng ký thành công, chuyển sang trạng thái RegistrationSuccessState
-        yield SendingSucceed();
+        yield WaitingForConfirmation();
 
-        // Lưu trữ thông tin người dùng trong Firestore
-        await _pushAppointment(event);
+        bool adminConfirmation = await _sendAndAwaitConfirmation(event);
+
+        if (adminConfirmation) {
+          yield SendingSucceed();
+        } else {
+          yield SendingError(error: "Admin rejected the appointment.");
+        }
       } else {
-        // Đăng ký thất bại, chuyển sang trạng thái RegistrationErrorState
         yield SendingError(
-            error: "Sending failed. .");
+            error: "Sending failed. Please choose a valid time.");
       }
     } catch (error) {
-      // Xử lý lỗi nếu có
       yield SendingError(error: "Sending failed: $error");
     }
   }
 
-  Future<void> _pushAppointment(timeButtonPressed event) async {
+  Stream<AppointmentState> _handleFetchAppointmentData() async* {
     try {
-      CollectionReference Appointment =
+      List<AppointmentData> appointmentDataList =
+      await _fetchAppointmentDataFromFirestore();
+
+      yield LoadedAppointmentData(appointmentDataList);
+    } catch (error) {
+      yield SendingError(error: "Fetching data failed: $error");
+    }
+  }
+
+  Stream<AppointmentState> _handleConfirmAppointment(ConfirmButtonPressed event) async* {
+    try {
+      // Xử lý logic khi xác nhận cuộc hẹn
+      await FirebaseFirestore.instance
+          .collection('Appointment')
+          .doc(event.phone)
+          .update({'status': 'confirmed'});
+
+      // Hiển thị thông báo
+      await firebaseApi.showNotification(
+        'Appointment Confirmed',
+        'Your appointment has been confirmed.',
+      );
+    } catch (error) {
+      print("Error confirming appointment: $error");
+    }
+  }
+
+  Stream<AppointmentState> _handleRejectAppointment(RejectButtonPressed event) async* {
+    try {
+      // Xử lý logic khi từ chối cuộc hẹn
+      await FirebaseFirestore.instance
+          .collection('Appointment')
+          .doc(event.phone)
+          .update({'status': 'rejected'});
+
+      // Hiển thị thông báo
+      await firebaseApi.showNotification(
+        'Appointment Rejected',
+        'Your appointment has been rejected.',
+      );
+    } catch (error) {
+      print("Error rejecting appointment: $error");
+    }
+  }
+
+
+  Future<bool> _sendAndAwaitConfirmation(TimeButtonPressed event) async {
+    try {
+      await _pushAppointment(event);
+
+      Completer<bool> confirmationCompleter = Completer<bool>();
+
+      FirebaseFirestore.instance
+          .collection('Appointment')
+          .doc(event.phone)
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.exists) {
+          String status = snapshot.get('status');
+          if (status == 'confirmed') {
+            confirmationCompleter.complete(true);
+          } else if (status == 'rejected') {
+            confirmationCompleter.complete(false);
+          }
+        }
+      });
+
+      await Future.delayed(Duration(days: 1));
+      if (!confirmationCompleter.isCompleted) {
+        confirmationCompleter.complete(false);
+      }
+      return confirmationCompleter.future;
+    } catch (error) {
+      print("Error sending and awaiting confirmation: $error");
+      return false;
+    }
+  }
+
+  Future<void> _pushAppointment(TimeButtonPressed event) async {
+    try {
+      CollectionReference appointment =
       FirebaseFirestore.instance.collection('Appointment');
       Timestamp appointmentTime = Timestamp.fromDate(event.time);
 
-      await Appointment.doc(event.phone).set({
+      await appointment.doc(event.phone).set({
         'name': event.name,
         'phonenumber': event.phone,
-        'time':appointmentTime ,
-        'dichvu':event.loaidichvu
+        'time': appointmentTime,
+        'dichvu': event.loaiDichVu,
+        'status': 'pending',
       });
     } catch (error) {
       print("Error storing user info in Firestore: $error");
-      // Xử lý lỗi nếu cần thiết
+    }
+  }
+
+  Future<List<AppointmentData>> _fetchAppointmentDataFromFirestore() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Appointment')
+          .where('status', isEqualTo: 'pending')
+          .get();
+
+      List<AppointmentData> appointmentDataList = querySnapshot.docs
+          .map((DocumentSnapshot doc) => AppointmentData(
+        name: doc.get('name'),
+        phoneNumber: doc.get('phonenumber'),
+        time: (doc.get('time') as Timestamp).toDate(),
+        loaiDichVu: doc.get('dichvu'),
+        status: doc.get('status'),
+      ))
+          .toList();
+      return appointmentDataList;
+    } catch (error) {
+      print("Error fetching appointment data from Firestore: $error");
+      return [];
     }
   }
 }

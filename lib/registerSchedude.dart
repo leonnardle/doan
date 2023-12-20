@@ -22,7 +22,7 @@ class registerSchedude extends StatefulWidget {
 class _registerSchedudeState extends State<registerSchedude> {
   User? user = FirebaseAuth.instance.currentUser;
   Customer customer = Customer('', '', '', '', DateTime.now());
-  late String selectedValue;
+  String? selectedValue;
 
   late int selectedIndex;
 
@@ -42,11 +42,11 @@ class _registerSchedudeState extends State<registerSchedude> {
         dateTime.toUtc().add(Duration(hours: hours, minutes: minutes));
     int timestamp = utcDateTime.millisecondsSinceEpoch;
     try {
-      BlocProvider.of<AppointmentBloc>(context).add(timeButtonPressed(
+      BlocProvider.of<AppointmentBloc>(context).add(TimeButtonPressed(
           customer.name,
           customer.phoneNumber,
           DateTime.fromMillisecondsSinceEpoch(timestamp),
-          selectedValue));
+          selectedValue!));
       showSuccessDialog(dateTime, hours, minutes);
     } catch (error) {
       showErrorDialog(error.toString());
@@ -287,38 +287,38 @@ class _registerSchedudeState extends State<registerSchedude> {
                     SizedBox(
                       width: 20,
                     ),
+                    Expanded(child:
                     BlocBuilder<serviceBloc, serviceState>(
                       builder: (context, state) {
                         if (state is LoadedDichVuList) {
-                          return DropdownButton<String>(
-                            value: selectedValue, // Giá trị mặc định
+                          return DropdownButton(
+                            value: selectedValue,
                             items: state.danhSachGiaTri
                                 .asMap()
                                 .entries
                                 .map((entry) {
                               String value = entry.value;
-
                               return DropdownMenuItem(
                                 value: value,
                                 child: Text(value),
                               );
-                            })
-                                .toList(),
+                            }).toList(),
                             onChanged: (String? newValue) {
+
                               if (newValue != null) {
+                                // Khi giá trị thay đổi, cập nhật selectedIndex
                                 setState(() {
                                   selectedValue = newValue;
                                 });
                               }
                             },
                           );
-                          ;
                         } else {
                           return CircularProgressIndicator();
                         }
                       },
                     ),
-                  ],
+                    )],
                 ),
               )
             ],
