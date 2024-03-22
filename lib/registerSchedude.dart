@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doan/model/Customer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -120,52 +119,26 @@ class _registerSchedudeState extends State<registerSchedude> {
     DateTime dateTime = widget.selectedDay;
     return Scaffold(
       body: Center(
-        child: Expanded(
-          flex: 1,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(25, 8, 25, 8),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            // mainAxisAlignment: MainAxisAlignment.start,
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
-              const Text(
-                'Thông tin lịch khám',
+              AppBar(
+                title: Center(
+                    child:
+                    Text('Thông tin lịch khám',
+                      style: TextStyle(fontWeight: FontWeight.bold),)),
               ),
               SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      border: Border.all(color: Colors.black),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  Text(
-                    'kín giờ',
-                  ),
-                  const SizedBox(width: 50),
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      border: Border.all(color: Colors.black),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  const Text(
-                    'còn trống',
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 30,
-              ),
+
               const Text(
-                'SÁNG',
+                'Sáng',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -224,6 +197,10 @@ class _registerSchedudeState extends State<registerSchedude> {
               ),
               const Text(
                 'chiều',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -274,53 +251,115 @@ class _registerSchedudeState extends State<registerSchedude> {
                       side: BorderSide(color: Colors.blue),
                       minimumSize: Size(100, 20),
                     ),
-                    child: Text('16:00-17h00',
-                        style: TextStyle(color: Colors.blue)),
+                    child:
+                        Text('16:00-17h00', style: TextStyle(color: Colors.blue)),
                   ),
                 ],
               ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  children: [
-                    Text("Chọn loại dịch vụ"),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Expanded(child:
-                    BlocBuilder<serviceBloc, serviceState>(
-                      builder: (context, state) {
-                        if (state is LoadedDichVuList) {
-                          return DropdownButton(
-                            value: selectedValue,
-                            items: state.danhSachGiaTri
-                                .asMap()
-                                .entries
-                                .map((entry) {
-                              String value = entry.value;
-                              return DropdownMenuItem(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-
-                              if (newValue != null) {
-                                // Khi giá trị thay đổi, cập nhật selectedIndex
-                                setState(() {
-                                  selectedValue = newValue;
-                                });
+              Row(
+                children: [
+                  Text("Chọn loại dịch vụ",
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Expanded(
+                    child: Row(
+                      children: <Widget>[
+                        Spacer(flex: 1,),
+                        Container( // Wrap DropdownButton with Container
+                          decoration: BoxDecoration( // Add border decoration
+                            border: Border.all(
+                              color: Colors.grey, // Customize border color
+                              width: 1.0, // Adjust border width
+                            ),
+                          ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: BlocBuilder<serviceBloc, serviceState>(
+                            builder: (context, state) {
+                              if (state is LoadedDichVuList) {
+                                return DropdownButton(
+                                  value: selectedValue,
+                                  items:
+                                      state.danhSachGiaTri.asMap().entries.map((entry) {
+                                    String value = entry.value;
+                                    return DropdownMenuItem(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    if (newValue != null) {
+                                      // Khi giá trị thay đổi, cập nhật selectedIndex
+                                      setState(() {
+                                        selectedValue = newValue;
+                                      });
+                                    }
+                                  },
+                                );
+                              } else {
+                                return CircularProgressIndicator();
                               }
                             },
-                          );
-                        } else {
-                          return CircularProgressIndicator();
-                        }
-                      },
+                          ),
+                        ),
+                                          ),
+                      ],
                     ),
-                    )],
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 60,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      border: Border.all(color: Colors.black),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  SizedBox( width: 20,),
+                  Text(
+                    'kín giờ',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 50),
+
+                ],
+              ),
+              SizedBox(height: 30,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
                 ),
-              )
+                SizedBox( width: 20,),
+                const Text(
+                  'còn trống',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+              ),
             ],
           ),
         ),

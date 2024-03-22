@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:doan/SchedudeScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
 
 import 'Bloc/Schedude/schedude_bloc.dart';
 import 'Bloc/serviceBloc/serviceBloc.dart';
 import 'SignInScreen/LoginScreen.dart';
+import 'notification_service.dart';
 
 class service extends StatefulWidget {
   const service({super.key});
@@ -17,10 +21,19 @@ class service extends StatefulWidget {
 class _serviceState extends State<service> {
   late int selectedIndex;
   final TextEditingController _loaidichvuController = TextEditingController();
+  NotificationService notificationService=NotificationService();
 
   @override
   void initState() {
     super.initState();
+    notificationService.requestNotificationPermission();
+    //notificationService.isTokenRefesh();
+    notificationService.FirebaseInit();
+    notificationService.getDeviceToken().then((value) {
+      print('device token: ');
+      print(value);
+    }
+    );
     BlocProvider.of<serviceBloc>(context).add(FetchDichVuListOnInit());
     BlocProvider.of<AppointmentBloc>(context).add(FetchAppointmentData());
 
@@ -64,7 +77,8 @@ class _serviceState extends State<service> {
       ),
       body: Container(
         margin: const EdgeInsets.only(top: 100),
-        child: Column(
+        child: Expanded(child:
+        Column(
           children: [
             TextField(
               controller: _loaidichvuController,
@@ -128,7 +142,6 @@ class _serviceState extends State<service> {
                         items: state.danhSachGiaTri.asMap().entries.map((entry) {
                           int index = entry.key;
                           String value = entry.value;
-
                           return DropdownMenuItem(
                             value: value,
                             child: Text(value),
@@ -160,6 +173,7 @@ class _serviceState extends State<service> {
             )),
             SizedBox(height: 20),
 
+            Expanded(child:
             Row(
               children: [
                 Expanded(
@@ -189,9 +203,29 @@ class _serviceState extends State<service> {
                                       onPressed: () {
                                         BlocProvider.of<AppointmentBloc>(context).add(
                                           ConfirmButtonPressed(rowData.phoneNumber),
-
                                         );
                                         BlocProvider.of<AppointmentBloc>(context).add(FetchAppointmentData());
+                                        notificationService.getDeviceToken().then((value) async  {
+                                          var data={
+                                            'to':'dGrqrQULQxGCVnZLXjubKf:APA91bENe8q2Lmp-vJt0CO2TviM8Iv5YOZA9vTEOQ7lpWnAFh07RGszi6Rk3oTcS70Jap34viTV4u6LMo8Eh6pzdEu-I0G3x8u606cBtEez_ZlMMfj2HKjUjn3FKF2wI6aZNUHN2rYT8',
+                                            'priority' :'high',
+                                            'notification' :{
+                                              'title' : 'xac nhan lich hen',
+                                              'body': 'ban da dang ky lich thanh cong'
+                                            },
+                                            'data' :{
+                                              'type' : 'msj',
+                                              'id' :'trung'
+                                            }
+                                          };
+                                          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+                                          body: jsonEncode(data),
+                                            headers: {
+                                            'Content-Type': 'application/json; charset=UTF-8',
+                                              'Authorization' : 'key=AAAAHYUTZR0:APA91bEq_VX59V_Sh_5zK-Pd5vd9s0Vryk_8caiiSxEyBldAFX-arYbePZNuaQX5peftb-lLa5MKl6fw0gutm4IXkKWNH3sJAeLu-r7aCkZTAm5ce0BpPhvy2q4qb6VSU2NooGWhqz5S'
+                                            }
+                                          );
+                                        });
 
                                       },
                                       child: Text("Xác nhận"),
@@ -220,9 +254,9 @@ class _serviceState extends State<service> {
                 ),
               ],
             ),
-          ],
+            )],
         ),
       ),
-    );
+      ) );
   }
 }

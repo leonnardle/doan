@@ -28,10 +28,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
   @override
-  void initState() {
+   void initState()  {
     super.initState();
     // Lấy thông tin người dùng khi màn hình được tạo
     _loadCurrentUserData();
+    // khởi tạo quyền đề nhận thông báo
+
+
   }
 
   // Phương thức để load thông tin người dùng đã đăng nhập
@@ -49,20 +52,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             .collection('user_info')
             .doc(docID)
             .get();
-
         if (userInfo.exists) {
-          // Cập nhật thông tin người dùng vào đối tượng Customer
+          // Cập nhật thông tin người dùng vào  Customer
           _customer.name = userInfo['name'];
           _customer.address = userInfo['address'];
-          // Cập nhật các thông tin khác tương ứng
 
-          // Kích hoạt lại build để cập nhật giao diện
-          if (mounted) {
-            setState(() {});
-          }
         } else {
          Fluttertoast.showToast(msg: 'msg');
-
         }
       } else {
         print("Người dùng chưa đăng nhập");

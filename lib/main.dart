@@ -1,10 +1,9 @@
 import 'package:doan/Bloc/serviceBloc/serviceBloc.dart';
 import 'package:doan/SignInScreen/LoginScreen.dart';
-import 'package:doan/firebase_api.dart';
 import 'package:doan/firebase_options.dart';
-import 'package:doan/registerSchedude.dart';
-import 'package:doan/service.dart';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'Bloc/Schedude/schedude_bloc.dart';
@@ -13,7 +12,7 @@ import 'Bloc/sign_up/create_user_bloc.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseApi().initNotification();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessageBackgroundHandle);
   runApp(
     MultiBlocProvider(
       providers: [
@@ -31,7 +30,13 @@ Future<void> main() async {
     ),
   );
 }
+@pragma('vm:entry-point')
+Future<void>_firebaseMessageBackgroundHandle(RemoteMessage message)async{
+  await Firebase.initializeApp();
+  print(message.notification!.title.toString());
+  print(message.notification!.body.toString());
 
+}
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

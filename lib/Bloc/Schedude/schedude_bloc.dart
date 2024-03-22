@@ -2,9 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../firebase_api.dart';
 // dùng để thông báo
-final FirebaseApi firebaseApi = FirebaseApi();
 
 class AppointmentData {
   final String name;
@@ -88,10 +86,8 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
       yield LoadingState();
       yield* _handleFetchAppointmentData();
     } else if (event is ConfirmButtonPressed) {
-      // Xử lý nút "Xác nhận" tại đây
       yield* _handleConfirmAppointment(event);
     } else if (event is RejectButtonPressed) {
-      // Xử lý nút "Từ chối" tại đây
       yield* _handleRejectAppointment(event);
     }
   }
@@ -136,10 +132,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
           .update({'status': 'confirmed'});
 
       // Hiển thị thông báo
-      await firebaseApi.showNotification(
-        'Appointment Confirmed',
-        'Your appointment has been confirmed.',
-      );
+
     } catch (error) {
       print("Error confirming appointment: $error");
     }
@@ -152,12 +145,8 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
           .collection('Appointment')
           .doc(event.phone)
           .update({'status': 'rejected'});
-
       // Hiển thị thông báo
-      await firebaseApi.showNotification(
-        'Appointment Rejected',
-        'Your appointment has been rejected.',
-      );
+
     } catch (error) {
       print("Error rejecting appointment: $error");
     }
@@ -167,9 +156,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
   Future<bool> _sendAndAwaitConfirmation(TimeButtonPressed event) async {
     try {
       await _pushAppointment(event);
-
       Completer<bool> confirmationCompleter = Completer<bool>();
-
       FirebaseFirestore.instance
           .collection('Appointment')
           .doc(event.phone)
@@ -191,11 +178,10 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
       }
       return confirmationCompleter.future;
     } catch (error) {
-      print("Error sending and awaiting confirmation: $error");
+      print("Error sending : $error");
       return false;
     }
   }
-
   Future<void> _pushAppointment(TimeButtonPressed event) async {
     try {
       CollectionReference appointment =
@@ -213,14 +199,12 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
       print("Error storing user info in Firestore: $error");
     }
   }
-
   Future<List<AppointmentData>> _fetchAppointmentDataFromFirestore() async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('Appointment')
           .where('status', isEqualTo: 'pending')
           .get();
-
       List<AppointmentData> appointmentDataList = querySnapshot.docs
           .map((DocumentSnapshot doc) => AppointmentData(
         name: doc.get('name'),
