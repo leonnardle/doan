@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doan/Bloc/sign_up/create_user_bloc.dart';
 import 'package:doan/ProfileScreen.dart';
+import 'package:doan/screen/chat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:doan/View/Home_Page/Thongtin.dart';
@@ -314,7 +315,7 @@ class _Home_PageState extends State<Home_Page> {
                             // Navigate to ProfileScreen
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => Thuoc()),
+                              MaterialPageRoute(builder: (context) => ChatScreen()),
                             );
                           },
                           child: Column(
@@ -329,7 +330,7 @@ class _Home_PageState extends State<Home_Page> {
                                   ),
                                   Image(
                                     image: AssetImage(
-                                        'assets/image/thuvienthuoc.png'),
+                                        'assets/image/tuvan.png'),
                                     width: 60,
                                     height: 60,
                                   ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:doan/SchedudeScreen.dart';
+import 'package:doan/screen/chat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -168,6 +169,18 @@ class _serviceState extends State<service> {
                     BlocProvider.of<AppointmentBloc>(context).add(FetchAppointmentData());
                   },
                   child: const Text("reset dich vu"),
+
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: (){
+                      // Navigate to ProfileScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ChatScreen()),
+                      );
+                  } ,
+                  child: const Text("chat"),
                 ),
               ],
             )),

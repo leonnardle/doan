@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                              context: context);
                          if (user != null) {
                            // Kiểm tra xem email có phải là "trungquocle636@gmail.com" không
-                           if (user.email == "trungquocle636@gmail.com") {
+                           if (user.email == "trungquoc@gmail.com") {
                              // Nếu đúng, chuyển hướng đến màn hình AdminScreen
                              Navigator.pushAndRemoveUntil(
                                context,
